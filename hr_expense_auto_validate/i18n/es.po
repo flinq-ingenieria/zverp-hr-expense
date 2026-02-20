@@ -17,11 +17,6 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #. module: hr_expense_auto_validate
-#: model:ir.ui.view,arch_db:hr_expense_auto_validate.hr_expense_view_form_confirm_button
-msgid "Confirm"
-msgstr "Confirmar"
-
-#. module: hr_expense_auto_validate
 #: model_terms:ir.ui.view,arch_db:hr_expense_auto_validate.hr_expense_view_form_confirm_button
 msgid "Confirm"
 msgstr "Confirmar"
