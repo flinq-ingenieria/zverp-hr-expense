@@ -1,0 +1,39 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* hr_expense_auto_validate
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-02-20 00:00+0000\n"
+"PO-Revision-Date: 2026-02-20 00:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#. module: hr_expense_auto_validate
+#: model:ir.ui.view,arch_db:hr_expense_auto_validate.hr_expense_view_form_confirm_button
+msgid "Confirm"
+msgstr "Confirmar"
+
+#. module: hr_expense_auto_validate
+#: model_terms:ir.ui.view,arch_db:hr_expense_auto_validate.hr_expense_view_form_confirm_button
+msgid "Confirm"
+msgstr "Confirmar"
+
+#. module: hr_expense_auto_validate
+#: code:addons/hr_expense_auto_validate/models/hr_expense.py:0
+#, python-format
+msgid "Expense Report"
+msgstr "Informe de gastos"
+
+#. module: hr_expense_auto_validate
+#: code:addons/hr_expense_auto_validate/models/hr_expense.py:0
+#, python-format
+msgid "Expense Reports"
+msgstr "Informes de gastos"
