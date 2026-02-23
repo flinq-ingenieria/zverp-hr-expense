@@ -1,0 +1,11 @@
+[project]
+name = "zverp-addons-expense"
+version = "16.0"
+dependencies = [
+    "odoo-addon-hr_expense==16.0.*",
+]
+classifiers=[
+    "Programming Language :: Python",
+    "Framework :: Odoo",
+    "Framework :: Odoo :: 16.0",
+]
