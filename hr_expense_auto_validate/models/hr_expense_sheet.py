@@ -9,9 +9,18 @@ class HrExpenseSheet(models.Model):
             "default_notify": False,
             "mail_auto_subscribe_no_notify": True,
             "mail_notify_force_send": False,
+            "mail_notify_noemail": True,
             "mail_post_autofollow": False,
+            "mail_create_nolog": True,
+            "mail_notrack": True,
             "tracking_disable": True,
         }
+
+    def _do_approve(self):
+        sheets = self.sudo().with_context(
+            **self._auto_validate_mail_suppression_context()
+        )
+        return super(HrExpenseSheet, sheets)._do_approve()
 
     def action_submit_sheet(self):
         """Submit, auto-approve and post accounting entries."""

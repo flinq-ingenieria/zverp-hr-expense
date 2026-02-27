@@ -9,7 +9,10 @@ class HrExpense(models.Model):
             "default_notify": False,
             "mail_auto_subscribe_no_notify": True,
             "mail_notify_force_send": False,
+            "mail_notify_noemail": True,
             "mail_post_autofollow": False,
+            "mail_create_nolog": True,
+            "mail_notrack": True,
             "tracking_disable": True,
         }
 

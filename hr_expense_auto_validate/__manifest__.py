@@ -5,7 +5,7 @@
     "category": "Human Resources/Expenses",
     "license": "AGPL-3",
     "author": "zvERP.com",
-    "website": "zvERP.com",
+    "website": "https://zverp.com",
     "depends": ["hr_expense"],
     "data": [
         "views/hr_expense_views.xml",
