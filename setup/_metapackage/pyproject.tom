@@ -1,9 +1,7 @@
 [project]
 name = "zverp-addons-expense"
 version = "16.0"
-dependencies = [
-    "odoo-addon-hr-expense-auto-validate==16.0.*",
-]
+
 classifiers=[
     "Programming Language :: Python",
     "Framework :: Odoo",
