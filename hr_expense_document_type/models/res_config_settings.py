@@ -5,7 +5,6 @@ class ResConfigSettings(models.TransientModel):
     _inherit = "res.config.settings"
 
     expense_default_document_type = fields.Selection(
-        selection=[("entry", "Gasto"), ("invoice", "Factura")],
         string="Default Expense Document Type",
         related="company_id.expense_default_document_type",
         readonly=False,

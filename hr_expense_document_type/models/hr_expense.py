@@ -10,19 +10,28 @@ ENTRY_JOURNAL_PARAM = "hr_expense.entry_journal_id"
 class HrExpense(models.Model):
     _inherit = "hr.expense"
 
-    @api.model
-    def _default_expense_document_type(self):
-        return self.env.company.expense_default_document_type or "entry"
-
     expense_document_type = fields.Selection(
         selection=[("invoice", "Factura"), ("entry", "Gasto")],
         string="Tipo de documento",
-        default=_default_expense_document_type,
+        default="entry",
         required=True,
         tracking=True,
         states={"done": [("readonly", True)], "approved": [("readonly", True)], "reported": [("readonly", True)]},
         help="Factura: crea factura proveedor. Gasto: crea asiento contable en diario miscelaneo.",
     )
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            if vals.get("expense_document_type"):
+                continue
+            company = (
+                self.env["res.company"].browse(vals["company_id"])
+                if vals.get("company_id")
+                else self.env.company
+            )
+            vals["expense_document_type"] = company.sudo().expense_default_document_type or "entry"
+        return super().create(vals_list)
 
     def _get_default_expense_sheet_values(self):
         # If there is an expense with total_amount_company == 0, it means that expense has not been processed by OCR yet
