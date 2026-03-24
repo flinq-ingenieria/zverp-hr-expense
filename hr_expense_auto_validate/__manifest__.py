@@ -3,7 +3,7 @@
     "version": "16.0.1.0.0",
     "summary": "Auto-submit, auto-approve and auto-create accounting moves for expenses",
     "license": "AGPL-3",
-    "author": "Custom",
+    "author": "zvERP",
     "depends": ["hr_expense_document_type"],
     "category": "Human Resources/Expenses",
     "data": [

@@ -12,24 +12,7 @@ class HrExpense(models.Model):
         context_vals = self._get_default_expense_sheet_values()
         sheets = self.env["hr.expense.sheet"].create(context_vals)
         sheets.action_submit_sheet()
-
-        if len(sheets) > 1:
-            return {
-                "name": _("Expense Reports"),
-                "type": "ir.actions.act_window",
-                "views": [[False, "list"], [False, "form"]],
-                "res_model": "hr.expense.sheet",
-                "domain": [("id", "in", sheets.ids)],
-                "context": self.env.context,
-            }
-        return {
-            "name": _("Expense Report"),
-            "type": "ir.actions.act_window",
-            "views": [[False, "form"]],
-            "res_model": "hr.expense.sheet",
-            "target": "current",
-            "res_id": sheets.id,
-        }
+        return self.env["ir.actions.act_window"]._for_xml_id("hr_expense.hr_expense_actions_my_all")
 
 
 class HrExpenseSheet(models.Model):

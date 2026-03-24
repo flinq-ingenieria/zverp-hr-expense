@@ -3,7 +3,7 @@
     "version": "16.0.1.0.0",
     "summary": "Expense lines with Invoice/Entry behavior and optional auto-processing",
     "license": "AGPL-3",
-    "author": "Custom",
+    "author": "zvERP",
     "depends": ["hr_expense", "account"],
     "category": "Human Resources/Expenses",
     "data": [
