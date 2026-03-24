@@ -4,25 +4,14 @@ from odoo import _, models
 class HrExpense(models.Model):
     _inherit = "hr.expense"
 
-    def _auto_validate_mail_suppression_context(self):
-        return {
-            "default_notify": False,
-            "mail_auto_subscribe_no_notify": True,
-            "mail_notify_force_send": False,
-            "mail_notify_noemail": True,
-            "mail_post_autofollow": False,
-            "mail_create_nolog": True,
-            "mail_notrack": True,
-            "tracking_disable": True,
-        }
-
     def action_submit_expenses(self):
-        """Create report(s) and trigger auto submit/approve/post flow."""
+        """Skip draft report step when auto-process is enabled for the company."""
+        if len(self.company_id) != 1 or not self.company_id.expense_auto_process_enabled:
+            return super().action_submit_expenses()
+
         context_vals = self._get_default_expense_sheet_values()
         sheets = self.env["hr.expense.sheet"].create(context_vals)
-        sheets.sudo().with_context(
-            **self._auto_validate_mail_suppression_context()
-        ).action_submit_sheet()
+        sheets.action_submit_sheet()
 
         if len(sheets) > 1:
             return {
@@ -33,13 +22,34 @@ class HrExpense(models.Model):
                 "domain": [("id", "in", sheets.ids)],
                 "context": self.env.context,
             }
-
         return {
             "name": _("Expense Report"),
             "type": "ir.actions.act_window",
             "views": [[False, "form"]],
             "res_model": "hr.expense.sheet",
-            "res_id": sheets.id,
             "target": "current",
-            "context": self.env.context,
+            "res_id": sheets.id,
         }
+
+
+class HrExpenseSheet(models.Model):
+    _inherit = "hr.expense.sheet"
+
+    def _is_auto_process_enabled(self):
+        self.ensure_one()
+        return bool(self.company_id.expense_auto_process_enabled)
+
+    def action_submit_sheet(self):
+        result = super().action_submit_sheet()
+
+        if not self._is_auto_process_enabled():
+            return result
+
+        for sheet in self.filtered(lambda s: s.state == "submit"):
+            sheet = sheet.sudo()
+            sheet._validate_analytic_distribution()
+            sheet._do_approve()
+            if sheet.state == "approve":
+                sheet.action_sheet_move_create()
+
+        return result

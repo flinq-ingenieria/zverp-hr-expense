@@ -1,10 +1,10 @@
 {
-    "name": "HR Expense Auto Validate",
+    "name": "HR Expense Document Type",
     "version": "16.0.1.0.0",
-    "summary": "Auto-submit, auto-approve and auto-create accounting moves for expenses",
+    "summary": "Expense lines with Invoice/Entry behavior and optional auto-processing",
     "license": "AGPL-3",
     "author": "Custom",
-    "depends": ["hr_expense_document_type"],
+    "depends": ["hr_expense", "account"],
     "category": "Human Resources/Expenses",
     "data": [
         "views/hr_expense_views.xml",
