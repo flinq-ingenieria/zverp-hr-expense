@@ -19,6 +19,28 @@ class HrExpense(models.Model):
         states={"done": [("readonly", True)], "approved": [("readonly", True)], "reported": [("readonly", True)]},
         help="Factura: crea factura proveedor. Gasto: crea asiento contable en diario miscelaneo.",
     )
+    invoice_partner_id = fields.Many2one(
+        "res.partner",
+        string="Proveedor factura",
+        tracking=True,
+        states={"done": [("readonly", True)], "approved": [("readonly", True)], "reported": [("readonly", True)]},
+    )
+    invoice_number = fields.Char(
+        string="Nº factura",
+        tracking=True,
+        states={"done": [("readonly", True)], "approved": [("readonly", True)], "reported": [("readonly", True)]},
+    )
+    invoice_date_manual = fields.Date(
+        string="Fecha factura",
+        tracking=True,
+        states={"done": [("readonly", True)], "approved": [("readonly", True)], "reported": [("readonly", True)]},
+    )
+
+    invoice_notes = fields.Text(
+        string="Observaciones factura",
+        tracking=True,
+        states={"done": [("readonly", True)], "approved": [("readonly", True)], "reported": [("readonly", True)]},
+    )
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -60,12 +82,22 @@ class HrExpense(models.Model):
                 if expense.payment_mode == "own_account"
                 else "invoice"
             )
-            key = (expense.payment_mode, doc_type_key)
+            if expense.payment_mode == "own_account" and doc_type_key == "invoice":
+                key = (
+                    expense.payment_mode,
+                    doc_type_key,
+                    expense.invoice_partner_id.id or False,
+                    (expense.invoice_number or "").strip() or False,
+                )
+            else:
+                key = (expense.payment_mode, doc_type_key)
             grouped_expenses.setdefault(key, self.env["hr.expense"])
             grouped_expenses[key] |= expense
 
         values = []
-        for (payment_mode, doc_type), todo in grouped_expenses.items():
+        for key, todo in grouped_expenses.items():
+            payment_mode = key[0]
+            doc_type = key[1]
             paid_by = "company" if payment_mode == "company_account" else "employee"
             doc_label = dict(self._fields["expense_document_type"].selection).get(doc_type, doc_type)
 
@@ -151,8 +183,7 @@ class HrExpenseSheet(models.Model):
     def _get_entry_reference(self):
         self.ensure_one()
         date_value = (
-            self.accounting_date
-            or max(self.expense_line_ids.mapped("date"))
+            max(self.expense_line_ids.mapped("date"))
             or fields.Date.context_today(self)
         )
         if isinstance(date_value, str):
@@ -253,8 +284,19 @@ class HrExpenseSheet(models.Model):
     def _prepare_bill_vals(self):
         self.ensure_one()
         move_vals = super()._prepare_bill_vals()
-        move_vals["ref"] = self._get_invoice_reference()
-        if not move_vals.get("partner_id"):
+        invoice_expense = self.expense_line_ids.filtered(lambda exp: exp.expense_document_type == "invoice")[:1]
+
+        move_vals["ref"] = (
+            (invoice_expense.invoice_number or "").strip()
+            or self._get_invoice_reference()
+        )
+        if invoice_expense.invoice_date_manual:
+            move_vals["invoice_date"] = invoice_expense.invoice_date_manual
+
+        if invoice_expense.invoice_partner_id:
+            move_vals["partner_id"] = invoice_expense.invoice_partner_id.id
+            move_vals["commercial_partner_id"] = invoice_expense.invoice_partner_id.commercial_partner_id.id
+        elif not move_vals.get("partner_id"):
             partner = self._get_employee_fallback_partner()
             move_vals["partner_id"] = partner.id
             move_vals["commercial_partner_id"] = partner.id

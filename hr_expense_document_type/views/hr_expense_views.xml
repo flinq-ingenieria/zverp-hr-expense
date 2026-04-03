@@ -19,6 +19,27 @@
             <xpath expr="//div[@id='payment_mode']" position="after">
                 <field name="expense_document_type" attrs="{'invisible': [('payment_mode', '!=', 'own_account')]}"/>
             </xpath>
+            <xpath expr="//field[@name='reference']" position="after">
+                <label
+                    for="invoice_partner_id"
+                    attrs="{'invisible': ['|', ('expense_document_type', '!=', 'invoice'), ('payment_mode', '!=', 'own_account')]}"
+                />
+                <div attrs="{'invisible': ['|', ('expense_document_type', '!=', 'invoice'), ('payment_mode', '!=', 'own_account')]}">
+                    <field name="invoice_partner_id"/>
+                </div>
+                <field
+                    name="invoice_number"
+                    attrs="{'invisible': ['|', ('expense_document_type', '!=', 'invoice'), ('payment_mode', '!=', 'own_account')]}"
+                />
+                <field
+                    name="invoice_date_manual"
+                    attrs="{'invisible': ['|', ('expense_document_type', '!=', 'invoice'), ('payment_mode', '!=', 'own_account')]}"
+                />
+                <field
+                    name="invoice_notes"
+                    attrs="{'invisible': ['|', ('expense_document_type', '!=', 'invoice'), ('payment_mode', '!=', 'own_account')]}"
+                />
+            </xpath>
         </field>
     </record>
 
