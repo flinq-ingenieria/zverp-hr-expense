@@ -2,7 +2,7 @@
 HR Expense Vendor Bill
 =======================
 
-Modulo Odoo 16 con flujo de factura de proveedor para gastos con factura.
+Modulo Odoo 16 con flujo de factura de proveedor para gastos con factura. (flujo W)
 
 Que anade
 ---------

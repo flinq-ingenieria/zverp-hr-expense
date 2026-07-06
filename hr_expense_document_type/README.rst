@@ -2,7 +2,7 @@
 HR Expense Document Type
 ========================
 
-Modulo Odoo 16 para distinguir entre gasto contable y gasto con factura.
+Modulo Odoo 16 para distinguir entre gasto contable y gasto con factura. (flujo F)
 
 Que anade
 ---------
