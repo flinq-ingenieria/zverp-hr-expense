@@ -163,12 +163,31 @@ class HrExpense(models.Model):
 class HrExpenseSheet(models.Model):
     _inherit = "hr.expense.sheet"
 
+    use_invoice_journal = fields.Boolean(
+        compute="_compute_use_invoice_journal",
+    )
+
     def _get_entry_journal(self):
         self.ensure_one()
         journal_id = self.env["ir.config_parameter"].sudo().get_param(ENTRY_JOURNAL_PARAM)
         if not journal_id:
             return self.env["account.journal"]
         return self.env["account.journal"].browse(int(journal_id)).exists()
+
+    @api.depends("payment_mode", "expense_line_ids.expense_document_type")
+    def _compute_use_invoice_journal(self):
+        for sheet in self:
+            sheet.use_invoice_journal = sheet._is_invoice_sheet()
+
+    @api.depends("journal_id", "bank_journal_id", "payment_mode", "expense_line_ids.expense_document_type")
+    def _compute_journal_displayed_id(self):
+        for sheet in self:
+            if sheet._is_invoice_sheet():
+                sheet.journal_displayed_id = sheet.journal_id
+                continue
+
+            paid_by_employee = sheet.payment_mode == "own_account"
+            sheet.journal_displayed_id = sheet.journal_id if paid_by_employee else sheet.bank_journal_id
 
     def _is_entry_sheet(self):
         self.ensure_one()

@@ -79,9 +79,13 @@ class TestHrExpenseVendorBill(TestExpenseCommon):
                 "name": "Invoice Company Account",
                 "employee_id": self.expense_employee.id,
                 "journal_id": self.company_data["default_journal_purchase"].id,
+                "bank_journal_id": self.company_data["default_journal_bank"].id,
                 "expense_line_ids": [(6, 0, [expense.id])],
             }
         )
+
+        self.assertTrue(sheet.use_invoice_journal)
+        self.assertEqual(sheet.journal_displayed_id, self.company_data["default_journal_purchase"])
 
         sheet.action_submit_sheet()
         sheet.approve_expense_sheets()
@@ -90,6 +94,7 @@ class TestHrExpenseVendorBill(TestExpenseCommon):
         self.assertEqual(sheet.account_move_id.move_type, "in_invoice")
         self.assertEqual(sheet.account_move_id.state, "draft")
         self.assertEqual(sheet.account_move_id.ref, "CA-001")
+        self.assertEqual(sheet.account_move_id.journal_id, self.company_data["default_journal_purchase"])
 
         payments = self.env["account.payment"].search([("expense_sheet_id", "=", sheet.id)])
         self.assertFalse(payments)

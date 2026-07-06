@@ -30,4 +30,21 @@
             </xpath>
         </field>
     </record>
+
+    <record id="hr_expense_sheet_view_form_inherit_vendor_bill" model="ir.ui.view">
+        <field name="name">hr.expense.sheet.form.vendor.bill</field>
+        <field name="model">hr.expense.sheet</field>
+        <field name="inherit_id" ref="hr_expense.hr_expense_sheet_view_form"/>
+        <field name="arch" type="xml">
+            <field name="payment_mode" position="after">
+                <field name="use_invoice_journal" invisible="1"/>
+            </field>
+            <field name="journal_id" position="attributes">
+                <attribute name="attrs">{'invisible': ['&amp;', ('payment_mode', '!=', 'own_account'), ('use_invoice_journal', '=', False)]}</attribute>
+            </field>
+            <field name="bank_journal_id" position="attributes">
+                <attribute name="attrs">{'invisible': ['|', ('payment_mode', '!=', 'company_account'), ('use_invoice_journal', '=', True)]}</attribute>
+            </field>
+        </field>
+    </record>
 </odoo>
