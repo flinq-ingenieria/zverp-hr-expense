@@ -356,12 +356,23 @@ class HrExpenseSheet(models.Model):
             [("res_model", "=", "account.move"), ("res_id", "=", move.id)]
         )
         existing_keys = {(att.checksum or False, att.name or False, att.mimetype or False) for att in existing_attachments}
+        copied_attachments = self.env["ir.attachment"]
         for attachment in source_attachments:
             key = (attachment.checksum or False, attachment.name or False, attachment.mimetype or False)
             if key in existing_keys:
                 continue
-            attachment.copy({"res_model": move._name, "res_id": move.id})
+            copied_attachments |= attachment.copy({"res_model": move._name, "res_id": move.id})
             existing_keys.add(key)
+
+        if not move.message_main_attachment_id:
+            move_attachments = existing_attachments + copied_attachments
+            main_attachment = (
+                move_attachments.filtered(lambda att: att.mimetype and att.mimetype.endswith("pdf"))
+                or move_attachments.filtered(lambda att: att.mimetype and att.mimetype.startswith("image"))
+                or move_attachments.filtered(lambda att: not (att.mimetype and att.mimetype.endswith("xml")))
+            )
+            if main_attachment:
+                move.message_main_attachment_id = main_attachment[0]
 
     def _do_create_moves(self):
         self = self.with_context(clean_context(self.env.context))

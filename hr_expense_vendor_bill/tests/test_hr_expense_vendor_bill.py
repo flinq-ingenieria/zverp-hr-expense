@@ -65,6 +65,11 @@ class TestHrExpenseVendorBill(TestExpenseCommon):
             [("res_model", "=", "account.move"), ("res_id", "=", sheet.account_move_id.id)]
         )
         self.assertEqual(len(move_attachments), 1)
+        self.assertEqual(
+            sheet.account_move_id.message_main_attachment_id,
+            move_attachments,
+            "The copied attachment must be set as main attachment so 'Print Original Bills' can find it.",
+        )
 
     def test_invoice_company_account_creates_draft_vendor_bill_without_payment(self):
         partner = self.env["res.partner"].create({"name": "Proveedor CA", "supplier_rank": 1})
