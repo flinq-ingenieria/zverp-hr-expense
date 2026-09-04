@@ -140,6 +140,48 @@ class TestHrExpenseVendorBill(TestExpenseCommon):
         self.assertEqual(sheet.account_move_id.move_type, "entry")
         self.assertEqual(sheet.account_move_id.journal_id, self.misc_journal)
 
+    def test_entry_payment_state_reflects_reconciliation(self):
+        sheet = self.env["hr.expense.sheet"].create(
+            {
+                "name": "Entry Sheet Payment",
+                "employee_id": self.expense_employee.id,
+                "journal_id": self.company_data["default_journal_purchase"].id,
+                "expense_line_ids": [
+                    (
+                        0,
+                        0,
+                        {
+                            "name": "Entry Expense",
+                            "employee_id": self.expense_employee.id,
+                            "product_id": self.product_zero_cost.id,
+                            "total_amount": 150.0,
+                            "expense_document_type": "entry",
+                        },
+                    )
+                ],
+            }
+        )
+
+        sheet.action_submit_sheet()
+        sheet.approve_expense_sheets()
+        sheet.action_sheet_move_create()
+
+        self.assertEqual(sheet.account_move_id.payment_state, "not_paid")
+        self.assertEqual(sheet.payment_state, "not_paid")
+
+        payment_register = self.env["account.payment.register"].with_context(
+            active_model="account.move", active_ids=sheet.account_move_id.ids
+        ).create({})
+        payment_register._create_payments()
+
+        self.assertEqual(sheet.account_move_id.payment_state, "paid")
+        self.assertEqual(sheet.payment_state, "paid")
+
+        with self.assertRaises(UserError):
+            self.env["account.payment.register"].with_context(
+                active_model="account.move", active_ids=sheet.account_move_id.ids
+            ).create({})
+
     def test_standard_approval_flow_is_kept(self):
         partner = self.env["res.partner"].create({"name": "Proveedor Approvals", "supplier_rank": 1})
         expense = self._create_invoice_expense(partner=partner, number="AP-001")
